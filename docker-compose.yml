@@ -17,7 +17,7 @@ services:
     networks:
       - wordpress-network
     volumes:
-      - 'wordpress_data:/bitnami/wordpress'
+      - './wordpress:/bitnami/wordpress'
     depends_on:
       - mysql
     environment:
@@ -37,29 +37,25 @@ services:
       - "redis_data:/bitnami/redis/data"
 
   nginx:
-    image: docker.io/bitnami/nginx
+    image: nginx:latest
     networks:
-        - wordpress-network
-    ports:
-      - '80:8080'
-      - '443:8443'
-    volumes:
-      - 'nginx_data:/bitnami/nginx'
-      - './nginx/default.conf:/bitnami/nginx/conf/server_blocks/localhost.conf'
+      - wordpress-network
     depends_on:
       - wordpress
-    command: [ nginx, '-g', 'daemon off;' ]
-
-
+    links:
+      - wordpress
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - './nginx/core.conf:/etc/nginx/conf.d/core.conf'
+      - './nginx/proxy.conf:/etc/nginx/conf.d/proxy.conf'
+      - './nginx/wordpress.conf:/etc/nginx/conf.d/wordpress.conf'
 
 volumes:
   mysql_data:
     driver: local
   redis_data:
-    driver: local
-  nginx_data:
-    driver: local
-  wordpress_data:
     driver: local
 
 networks:
