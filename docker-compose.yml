@@ -45,9 +45,7 @@ services:
       - '443:8443'
     volumes:
       - 'nginx_data:/bitnami/nginx'
-      ## copy ./nginx/conf/wordpress-server-block.conf file to the nginx container
-      - ./nginx/default.conf:/bitnami/nginx/conf/server_blocks/localhost.conf
-
+      - './nginx/default.conf:/bitnami/nginx/conf/server_blocks/localhost.conf'
     depends_on:
       - wordpress
     command: [ nginx, '-g', 'daemon off;' ]
