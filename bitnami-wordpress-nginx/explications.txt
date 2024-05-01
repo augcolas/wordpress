@@ -1,0 +1,4 @@
+- j'ai fais un deuxième docker-compose en utilisant l'image bitnami/wordpress-nginx
+parce que je n'arrivais pas à configuré le nginx correctement sur le premier.
+
+- j'ai ajouté un conteneur redis mais je n'ai pas réussi à le connecter à wordpress.
