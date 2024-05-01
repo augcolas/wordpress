@@ -1,18 +1,21 @@
 version: '2'
 services:
+
   mysql:
     image: docker.io/bitnami/mysql:8.0
+    networks:
+      - wordpress-network
     volumes:
       - 'mysql_data:/bitnami/mysql'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_USER=bn_wordpress
       - MYSQL_DATABASE=bitnami_wordpress
+
   wordpress:
     image: docker.io/bitnami/wordpress:6
-    ports:
-      - '80:8080'
-      - '443:8443'
+    networks:
+      - wordpress-network
     volumes:
       - 'wordpress_data:/bitnami/wordpress'
     depends_on:
@@ -23,8 +26,44 @@ services:
       - WORDPRESS_DATABASE_PORT_NUMBER=3306
       - WORDPRESS_DATABASE_USER=bn_wordpress
       - WORDPRESS_DATABASE_NAME=bitnami_wordpress
+
+  redis:
+    image: docker.io/bitnami/redis
+    networks:
+      - wordpress-network
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - "redis_data:/bitnami/redis/data"
+
+  nginx:
+    image: docker.io/bitnami/nginx
+    networks:
+        - wordpress-network
+    ports:
+      - '80:8080'
+      - '443:8443'
+    volumes:
+      - 'nginx_data:/bitnami/nginx'
+      ## copy ./nginx/conf/wordpress-server-block.conf file to the nginx container
+      - ./nginx/default.conf:/bitnami/nginx/conf/server_blocks/localhost.conf
+
+    depends_on:
+      - wordpress
+    command: [ nginx, '-g', 'daemon off;' ]
+
+
+
 volumes:
   mysql_data:
     driver: local
+  redis_data:
+    driver: local
+  nginx_data:
+    driver: local
   wordpress_data:
     driver: local
+
+networks:
+    wordpress-network:
+        driver: bridge
