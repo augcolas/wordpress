@@ -1,8 +1,9 @@
+
 version: '2'
 services:
 
   mysql:
-    image: docker.io/bitnami/mysql:8.0
+    image: docker.io/bitnami/mysql
     networks:
       - wordpress-network
     volumes:
@@ -11,24 +12,6 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_USER=bn_wordpress
       - MYSQL_DATABASE=bitnami_wordpress
-
-  wordpress:
-    image: docker.io/bitnami/wordpress:6
-    networks:
-      - wordpress-network
-    ports:
-      - '8080:8080'
-      - '8443:8443'
-    volumes:
-      - './wordpress:/bitnami/wordpress'
-    depends_on:
-      - mysql
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - WORDPRESS_DATABASE_HOST=mysql
-      - WORDPRESS_DATABASE_PORT_NUMBER=3306
-      - WORDPRESS_DATABASE_USER=bn_wordpress
-      - WORDPRESS_DATABASE_NAME=bitnami_wordpress
 
   redis:
     image: docker.io/bitnami/redis
@@ -39,26 +22,33 @@ services:
     volumes:
       - "redis_data:/bitnami/redis/data"
 
-  nginx:
-    image: nginx:latest
+  wordpress:
+    image: docker.io/bitnami/wordpress-nginx:6
     networks:
       - wordpress-network
-    depends_on:
-      - wordpress
     ports:
-      - '80:80'
-      - '443:443'
+      - '80:8080'
+      - '443:8443'
     volumes:
-      - './nginx/core.conf:/etc/nginx/conf.d/core.conf'
-      - './nginx/proxy.conf:/etc/nginx/conf.d/proxy.conf'
-      - './nginx/wordpress.conf:/etc/nginx/conf.d/wordpress.conf'
+      - 'wordpress_data:/bitnami/wordpress'
+    depends_on:
+      - mysql
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - WORDPRESS_DATABASE_HOST=mysql
+      - WORDPRESS_DATABASE_PORT_NUMBER=3306
+      - WORDPRESS_DATABASE_USER=bn_wordpress
+      - WORDPRESS_DATABASE_NAME=bitnami_wordpress
 
 volumes:
   mysql_data:
     driver: local
   redis_data:
     driver: local
+  wordpress_data:
+    driver: local
 
 networks:
-    wordpress-network:
-        driver: bridge
+  wordpress-network:
+    driver: bridge
