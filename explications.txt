@@ -1,4 +1,7 @@
-- j'ai fais un deuxième docker-compose en utilisant l'image bitnami/wordpress-nginx
-parce que je n'arrivais pas à configuré le nginx correctement sur le premier.
+- j'ai fais un docker-compose qui utilise l'image bitnami/wordpress-nginx
+parce que après plusieurs heures je n'ai pas réussi à configuré nginx correctement sur le premier.
 
 - j'ai ajouté un conteneur redis mais je n'ai pas réussi à le connecter à wordpress.
+
+PS :
+la connexion à la base prends du temps, il faut attendre un peu pour que le site soit accessible.
